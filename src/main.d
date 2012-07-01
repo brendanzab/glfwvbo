@@ -17,8 +17,6 @@ int width = 640;
 int height = 480;
     
 void initGLFW(){
-    // Load OpenGL functions from Version 1.1
-    DerelictGL3.load();
     
     // Initialise GLFW
     DerelictGLFW3.load();
@@ -47,17 +45,15 @@ void initGLFW(){
     // Enable vertical sync (on cards that support it)
     glfwSwapInterval(1);
     
-    // Load OpenGL functions from Version 1.2+
-    DerelictGL3.reload();
-    
 }
 
 void initOpenGL() {
+    // Load DerelictGL3
+    DerelictGL3.load();     // Load OpenGL functions from Version 1.1
+    DerelictGL3.reload();   // Load OpenGL functions from Version 1.2+
+    
     // Log version and display info
     writeGLInfo();
-    
-    //// Added to see if the problem is face culling
-    //glDisable(GL_CULL_FACE);
     
     // Set the viewport dimensions
     glViewport(0, 0, width, height);
@@ -71,20 +67,20 @@ GLuint createShader(GLenum shaderType, string shaderFile) {
     GLuint shader = glCreateShader(shaderType);
     
     // Read the shader from the file
-    writefln(headingString("Reading shader from %s:"), shaderFile);
+    writefln("Reading shader from %s", shaderFile);
     const char* shaderFileData = toStringz(readText(shaderFile));
-    writefln("%s\n", to!string(shaderFileData));
-    glShaderSource(
-        shader,             // The shader object
-        1,                  // The number of strings (there can be multiple strings in one object)
-        &shaderFileData,    // The shader data
-        null                // Assume that the string is null-terminated
-    );
-    glCompileShader(shader);
+    glShaderSource(shader, 1, &shaderFileData, null);
     
+    glCompileShader(shader);
+    checkShader(shader);
+    return shader;
+}
+
+void checkShader(GLuint shader) {
     // Throw an exception if the compilation fails
     GLint succeeded;
     glGetShaderiv(shader, GL_COMPILE_STATUS, &succeeded);
+    
     if (!succeeded) {
         // Get log-length
         GLint len;
@@ -95,8 +91,6 @@ GLuint createShader(GLenum shaderType, string shaderFile) {
         glGetShaderInfoLog(shader, len, null, cast(char*)log);
         throw new Exception(format("%s %s", errorString("GLSL Compile failure:"), log));
     }
-    
-    return shader;
 }
 
 GLuint createProgram(GLuint shaders[]) {
@@ -113,10 +107,15 @@ GLuint createProgram(GLuint shaders[]) {
     glBindFragDataLocation(program, 0, "fragColor");
     
     glLinkProgram(program);
+    checkProgram(program);
     
-    // Throw an exception if the linking fails
+    return program;
+}
+
+void checkProgram(GLuint program) {
     GLint succeeded;
     glGetProgramiv(program, GL_LINK_STATUS, &succeeded);
+    
     if (!succeeded) {
         // Get log-length
         GLint len;
@@ -127,8 +126,6 @@ GLuint createProgram(GLuint shaders[]) {
         glGetProgramInfoLog(program, len, null, cast(char*)log);
         throw new Exception(format("%s %s", errorString("Program Linker failure:"), log));
     }
-    
-    return program;
 }
 
 // The handle for the shader program
