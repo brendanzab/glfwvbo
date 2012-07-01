@@ -1,0 +1,19 @@
+{
+    "folders":
+    [
+        {
+            "path": "../",
+            "name": "Project Source",
+            "folder_exclude_patterns": ["build"],
+            "file_exclude_patterns": ["*.sublime-workspace"]
+        },
+        {
+            "path": "/usr/local/src/Derelict3/import/derelict",
+            "name": "Derelict3"
+        },
+        {
+            "path": "/usr/local/src/dmd2/src/phobos/std",
+            "name": "Phobos"
+        }
+    ]
+}
