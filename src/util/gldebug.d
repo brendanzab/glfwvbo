@@ -1,6 +1,6 @@
 module glfwvbo.util.gldebug;
 
-import glfwvbo.util.styledout;
+import glfwvbo.util.prettyout;
 
 import std.stdio, std.conv;
 import derelict.opengl3.gl3;

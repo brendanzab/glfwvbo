@@ -1,6 +1,6 @@
 module glfwvbo.util.glfwdebug;
 
-import glfwvbo.util.styledout;
+import glfwvbo.util.prettyout;
 
 import std.stdio, std.conv, std.string;
 import derelict.glfw3.glfw3;

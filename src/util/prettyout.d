@@ -1,4 +1,4 @@
-module glfwvbo.util.styledout;
+module glfwvbo.util.prettyout;
 
 import glfwvbo.util.terminal;
 

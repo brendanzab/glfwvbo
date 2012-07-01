@@ -4,10 +4,7 @@ import glfwvbo.util.gldebug;
 import glfwvbo.util.glfwdebug;
 import glfwvbo.util.styledout;
 
-import std.conv     : to;
-import std.stdio    : writefln, writeln, write;
-import std.string   : toStringz, format;
-import std.file     : readText;
+import std.conv, std.stdio, std.string, std.file;
 import derelict.glfw3.glfw3;
 import derelict.opengl3.gl3;
 
@@ -175,7 +172,6 @@ void initShaders() {
     
     shaderProgram = createProgram(shaders);
 }
-
 
 // 4D positions of the verticies
 const GLfloat vertexPositions[] = [
