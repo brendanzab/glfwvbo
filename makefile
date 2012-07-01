@@ -7,8 +7,7 @@ DMD_BUILD_FLAGS 	= -gc
 DER2_PATH 			= /usr/local/src/Derelict3
 DER2_LINKER_FLAGS 	= -L-lDerelictGL3 -L-lDerelictGLFW3 -L-lDerelictUtil
 
-# Execute build
-all: 
+all:
 	dmd $(DMD_BUILD_FLAGS) \
 	$(D_SOURCE_FILES) \
 	-I$(DER2_PATH)/import \
@@ -18,3 +17,5 @@ all:
 	
 run:
 	@./$(BUILD_PATH)/$(EXECUTABLE_NAME)
+
+br: all run
