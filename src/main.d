@@ -46,6 +46,29 @@ void initGLFW(){
     // Enable vertical sync (on cards that support it)
     glfwSwapInterval(1);
     
+    // Setup input handling
+    glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
+    glfwSetKeyCallback(&keyCallback);
+    
+}
+
+void onKeyEvent(GLFWwindow window, int key, int action) {
+    if (action != GLFW_PRESS) return;
+    
+    switch(key) {
+        case GLFW_KEY_ESCAPE:
+            running = false;
+            break;
+            
+        default:
+            break;
+    }
+}
+
+extern(C) {
+    void keyCallback(void* window, int key, int action) {
+        onKeyEvent(window, key, action);
+    }
 }
 
 void initOpenGL() {
