@@ -1,6 +1,8 @@
 module glfwvbo.main;
 
-import glfwvbo.util.terminal;
+import glfwvbo.util.gldebug;
+import glfwvbo.util.glfwdebug;
+import glfwvbo.util.styledout;
 
 import std.conv     : to;
 import std.stdio    : writefln, writeln, write;
@@ -285,108 +287,5 @@ void onKeyEvent(GLFWwindow window, int key, int action) {
 extern(C) {
     void keyCallback(void* window, int key, int action) {
         onKeyEvent(window, key, action);
-    }
-}
-
-// Debug
-private {
-    /** Returns an underlined heading string */
-    string headingString(string heading) {
-        return esc(TermDisp.UNDERLINE) ~ heading ~ esc(TermDisp.RESET);
-    }
-
-    /** Returns a red error string */
-    string errorString(string message = "Error") {
-        return esc(TermDisp.FG_RED) ~ message ~ esc(TermDisp.RESET);
-    }
-
-    void writeGLFWInfo() {
-        if (!DerelictGLFW3.isLoaded()) {
-            writefln(errorString("DerelictSDL2 is not loaded!"));
-            return;
-        }
-        
-        // Get desktop video mode
-        GLFWvidmode dtmode;
-        glfwGetDesktopMode(&dtmode);
-        
-        // Get all available video modes
-        int MAX_NUM_MODES = 400;
-        GLFWvidmode* modes;
-        int modecount = glfwGetVideoModes(modes, MAX_NUM_MODES);
-        
-        // Print GLFW info
-        writefln(headingString("GLFW"));
-        writefln("Version:  %s", to!string(glfwGetVersionString()));
-        writefln("Desktop mode: %s", getModeString(dtmode));
-        writefln("Available modes: %d", modecount);
-        foreach (int i; 0..modecount) {
-            writefln(" %3d - %s", i, getModeString(modes[i]));
-        }
-        writeln();
-    }
-
-    string getModeString(GLFWvidmode mode) {
-        return format(
-            "%d x %d, %d bits",
-            mode.width, mode.height,
-            mode.redBits + mode.greenBits + mode.blueBits);
-    }
-
-    void writeGLInfo() {
-        if (!DerelictGL3.isLoaded()) {
-            writefln(errorString("DerelictGL3 is not loaded!"));
-            return;
-        }
-        
-        // Print OpenGL and GLSL version
-        writefln(headingString("OpenGL"));
-        writefln("Vendor:   %s", to!string(glGetString(GL_VENDOR)));
-        writefln("Renderer: %s", to!string(glGetString(GL_RENDERER)));
-        writefln("Version:  %s", to!string(glGetString(GL_VERSION)));
-        writefln("GLSL:     %s", to!string(glGetString(GL_SHADING_LANGUAGE_VERSION)));
-        writeln();
-    }
-
-    void writeGLFWErrors()() {
-        int errorID = glfwGetError();
-        while (errorID != GLFW_NO_ERROR)
-        {
-            writeln(errorString("GLFW Error: "), to!string(glfwErrorString(errorID)));
-            errorID = glfwGetError();
-        }
-    }
-
-    void writeGLErrors() {
-        GLenum glError = glGetError();
-        while (glError != GL_NO_ERROR) {
-            writeln(errorString("OpenGL Error: "), glErrorString(glError));
-            glError = glGetError();
-        }
-    }
-
-    string glErrorString(GLenum glError) {
-        switch(glError) {
-            case GL_NO_ERROR:
-                return "GL_NO_ERROR";
-                
-            case GL_INVALID_ENUM:
-                return "GL_INVALID_ENUM";
-                
-            case GL_INVALID_VALUE:
-                return "GL_INVALID_VALUE";
-                
-            case GL_INVALID_OPERATION:
-                return "GL_INVALID_OPERATION";
-                
-            case GL_INVALID_FRAMEBUFFER_OPERATION:
-                return "GL_INVALID_FRAMEBUFFER_OPERATION";
-                
-            case GL_OUT_OF_MEMORY:
-                return "GL_OUT_OF_MEMORY";
-                
-            default:
-                return "Unknown Error";
-        }
     }
 }

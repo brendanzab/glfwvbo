@@ -1,10 +1,9 @@
-/*
+/**
  * Module for helping to nicely format output on POSIX compliant systems
  *
  * See this page on ANSI Terminal Escape Sequences:
  * http://www.termsys.demon.co.uk/vtansi.htm
  */
-
 module glfwvbo.util.terminal;
 
 import std.string : format;

@@ -2,7 +2,7 @@
 
 EXECUTABLE_NAME="glfwvbo"
 BUILD_DIRECTORY="build"
-D_SOURCE_FILES="src/main.d src/util/terminal.d -Isrc"
+D_SOURCE_FILES="src/main.d src/util/*.d -Isrc"
 DMD_BUILD_FLAGS="-gc"
 
 # Change based on your derelict directory
