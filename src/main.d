@@ -24,6 +24,7 @@ void initGLFW(){
         throw new Exception(errorString("Failed to create glcontext"));
     }
     
+    // Log hardware and version info
     writeGLFWInfo();
     
     // Specify the profile that GLFW will load
@@ -50,8 +51,11 @@ void initOpenGL() {
     DerelictGL3.load();     // Load OpenGL functions from Version 1.1
     DerelictGL3.reload();   // Load OpenGL functions from Version 1.2+
     
-    // Log GLFW and GL info
+    // Log version and display info
     writeGLInfo();
+    
+    //// Added to see if the problem is face culling
+    //glDisable(GL_CULL_FACE);
     
     // Set the viewport dimensions
     glViewport(0, 0, width, height);
@@ -134,6 +138,12 @@ void initShaders() {
     shaders ~= createShader(GL_FRAGMENT_SHADER, "resources/shader.frag");
     
     shaderProgram = createProgram(shaders);
+    
+    // Print out various shader things to see if all went well...
+    writefln("Program handle:  %d", shaderProgram);
+    writefln("Shader handles:  %s", shaders);
+    writefln("Attrib Location: %d", glGetAttribLocation(shaderProgram, "position"));
+    writefln("Frag Location:   %d", glGetFragDataLocation(shaderProgram, "fragColor"));
 }
 
 // 4D positions of the verticies
@@ -232,7 +242,7 @@ void main() {
         
         render();
         
-        //break;
+        break;
     }
     
     cleanup();

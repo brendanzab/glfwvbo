@@ -1,8 +1,10 @@
 # glfwvbo
 
-A project illustrating how to use VBOs and Shaders with Derelict3.
+This project is illustrate how to use VBOs and Shaders with Derelict3.
 
-I still haven't got this working. It's still a WIP!
+*I still haven't got this working*. All it does is display a blank screen. Any assistance would be most appreaciated.
+
+I am very much a beginner, so I would caution against considering my work an example of best practices. You have been warned! :)
 
 I've only tested this on OSX - there might need to be modifications to it so that it can be run on Windows and Linux.
 
