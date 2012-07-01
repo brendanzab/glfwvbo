@@ -5,7 +5,7 @@
  * http://www.termsys.demon.co.uk/vtansi.htm
  */
 
-module terminal;
+module glfwvbo.util.terminal;
 
 import std.string : format;
 

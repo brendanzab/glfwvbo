@@ -1,6 +1,6 @@
-module glfwvbo;
+module glfwvbo.main;
 
-import terminal;
+import glfwvbo.util.terminal;
 
 import std.conv     : to;
 import std.stdio    : writefln, writeln, write;
