@@ -164,7 +164,7 @@ void initBuffers() {
     GLuint positionBufferObject;
     glGenBuffers(1, &positionBufferObject);
     glBindBuffer(GL_ARRAY_BUFFER, positionBufferObject);
-    glBufferData(GL_ARRAY_BUFFER, vertexPositions.length , vertexPositions.ptr, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertexPositions.length * float.sizeof, vertexPositions.ptr, GL_STATIC_DRAW);
     
     // Set attribute-pointer
     GLint positionLocation = glGetAttribLocation(shaderProgram, "position");
