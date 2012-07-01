@@ -17,6 +17,9 @@ int width = 640;
 int height = 480;
     
 void initGLFW(){
+    // Load OpenGL functions from Version 1.1
+    DerelictGL3.load();
+    
     // Initialise GLFW
     DerelictGLFW3.load();
     if(!glfwInit()) {
@@ -44,13 +47,12 @@ void initGLFW(){
     // Enable vertical sync (on cards that support it)
     glfwSwapInterval(1);
     
+    // Load OpenGL functions from Version 1.2+
+    DerelictGL3.reload();
+    
 }
 
 void initOpenGL() {
-    // Initialise OpenGL
-    DerelictGL3.load();     // Load OpenGL functions from Version 1.1
-    DerelictGL3.reload();   // Load OpenGL functions from Version 1.2+
-    
     // Log version and display info
     writeGLInfo();
     
@@ -138,12 +140,6 @@ void initShaders() {
     shaders ~= createShader(GL_FRAGMENT_SHADER, "resources/shader.frag");
     
     shaderProgram = createProgram(shaders);
-    
-    // Print out various shader things to see if all went well...
-    writefln("Program handle:  %d", shaderProgram);
-    writefln("Shader handles:  %s", shaders);
-    writefln("Attrib Location: %d", glGetAttribLocation(shaderProgram, "position"));
-    writefln("Frag Location:   %d", glGetFragDataLocation(shaderProgram, "fragColor"));
 }
 
 // 4D positions of the verticies
@@ -182,7 +178,7 @@ void initBuffers() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
     
-    writeGLErrors();
+    writeGLError();
     
 }
 
@@ -203,6 +199,8 @@ void render() {
     
     // Update the window
     glfwSwapBuffers();
+    
+    writeGLError();
 }
 
 void init() {
@@ -242,7 +240,7 @@ void main() {
         
         render();
         
-        break;
+        //break;
     }
     
     cleanup();

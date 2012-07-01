@@ -5,12 +5,10 @@ import glfwvbo.util.prettyout;
 import std.stdio, std.conv;
 import derelict.opengl3.gl3;
 
-void writeGLErrors() {
+void writeGLError() {
     GLenum glError = glGetError();
-    while (glError != GL_NO_ERROR) {
+    if (glError != GL_NO_ERROR)
         writeln(errorString("OpenGL Error: "), glErrorString(glError));
-        glError = glGetError();
-    }
 }
 
 void writeGLInfo() {
