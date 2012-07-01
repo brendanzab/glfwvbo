@@ -15,30 +15,6 @@ bool running = true;
 GLFWwindow window;
 int width = 640;
 int height = 480;
-
-void main() {
-    init();
-    
-    // Main game loop
-    while (glfwIsWindow(window) && running) {
-        // Poll events
-        glfwPollEvents();
-        
-        render();
-        
-        ///////////////////////
-        //break;
-    }
-    
-    cleanup();
-}
-
-void init() {
-    initGLFW();
-    initOpenGL();
-    initShaders();
-    initBuffers();
-}
     
 void initGLFW(){
     // Initialise GLFW
@@ -67,9 +43,6 @@ void initGLFW(){
     // Enable vertical sync (on cards that support it)
     glfwSwapInterval(1);
     
-    // Setup input handling
-    glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
-    glfwSetKeyCallback(&keyCallback);
 }
 
 void initOpenGL() {
@@ -103,10 +76,9 @@ GLuint createShader(GLenum shaderType, string shaderFile) {
     );
     glCompileShader(shader);
     
-    // Check whether the shader compilation was successful
+    // Throw an exception if the compilation fails
     GLint succeeded;
     glGetShaderiv(shader, GL_COMPILE_STATUS, &succeeded);
-    // Print an error log if the compilation fails 
     if (!succeeded) {
         // Get log-length
         GLint len;
@@ -121,13 +93,6 @@ GLuint createShader(GLenum shaderType, string shaderFile) {
     return shader;
 }
 
-// Shader attribute ids
-enum GLSLAttrib : GLuint {
-    POSITION = 0,
-    NORMAL   = 1,
-    TEXTURE  = 2
-};
-
 GLuint createProgram(GLuint shaders[]) {
     // Create an empty program object
     GLuint program = glCreateProgram();
@@ -137,17 +102,15 @@ GLuint createProgram(GLuint shaders[]) {
         glAttachShader(program, s);
     
     // Bind the attribute so that it can be used in the GLSL shader
-    glBindAttribLocation(program, GLSLAttrib.POSITION, "position");
+    glBindAttribLocation(program, 0, "position");
     // Bind the fragment shader's output
     glBindFragDataLocation(program, 0, "fragColor");
     
     glLinkProgram(program);
     
-    // Check the link status
+    // Throw an exception if the linking fails
     GLint succeeded;
     glGetProgramiv(program, GL_LINK_STATUS, &succeeded);
-    
-    // Print an error log if the linking fails 
     if (!succeeded) {
         // Get log-length
         GLint len;
@@ -174,7 +137,7 @@ void initShaders() {
 }
 
 // 4D positions of the verticies
-const GLfloat vertexPositions[] = [
+const float vertexPositions[] = [
     0.75,  0.75,  0.0,  1.0,
     0.75, -0.75,  0.0,  1.0,
    -0.75, -0.75,  0.0,  1.0
@@ -182,23 +145,19 @@ const GLfloat vertexPositions[] = [
 
 // The handles for the buffer objects
 GLuint vao;
-GLuint positionBufferObject;
 
 void initBuffers() {
-    // Create vertex array object
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
     
-    // Create the buffer object
+    // Create the buffer object and bind the vertex data
+    GLuint positionBufferObject;
     glGenBuffers(1, &positionBufferObject);
-    // Bind the buffer to the GL context's GL_ARRAY_BUFFER binding target
     glBindBuffer(GL_ARRAY_BUFFER, positionBufferObject);
-    // Allocate memory (in the GPU)
     glBufferData(GL_ARRAY_BUFFER, vertexPositions.length , vertexPositions.ptr, GL_STATIC_DRAW);
     
-    // Get the location of the position attribute
-    GLint positionLocation = glGetAttribLocation(shaderProgram, "position");
     // Set attribute-pointer
+    GLint positionLocation = glGetAttribLocation(shaderProgram, "position");
     glVertexAttribPointer(
         positionLocation,   // shader attribute
         4,                  // size
@@ -207,12 +166,10 @@ void initBuffers() {
         0,                  // stride
         null                // array buffer offset
     );
-    // Enable the position attribute
     glEnableVertexAttribArray(positionLocation);
     
-    // Unbind the buffer object
+    // Cleanup
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    // Unbind vertex array object
     glBindVertexArray(0);
     
     writeGLErrors();
@@ -220,17 +177,15 @@ void initBuffers() {
 }
 
 void render() {
-    // Clear the color buffer
+    // Clear the window
     glClear(GL_COLOR_BUFFER_BIT);
     
     // Activate the shader program
     glUseProgram(shaderProgram);
     
-    // Bind Vertex Array Object
+    // Draw the Vertex Array Object
     glBindVertexArray(vao);
-    // Start at the 0th index and draw 3 verticies
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-    // Unbind Vertex Array Object
+    glDrawArrays(GL_TRIANGLES, 0, 3);   // Start at the 0th index and draw 3 verticies
     glBindVertexArray(0);
     
     // Disable the program
@@ -240,12 +195,16 @@ void render() {
     glfwSwapBuffers();
 }
 
+void init() {
+    initGLFW();
+    initOpenGL();
+    initShaders();
+    initBuffers();
+}
+
 void cleanup() {
     
     writefln("Cleaning up OpenGL");
-    
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glDeleteBuffers(3, &positionBufferObject);
     
     glBindVertexArray(0);
     glDeleteVertexArrays(1, &vao);
@@ -263,25 +222,18 @@ void cleanup() {
     glfwTerminate();
 }
 
-// Input handling
-
-void onKeyEvent(GLFWwindow window, int key, int action) {
-    if (action != GLFW_PRESS) return;
+void main() {
+    init();
     
-    switch(key) {
-        case GLFW_KEY_ESCAPE:
-            running = false;
-            break;
-            
-        default:
-            break;
+    // Main game loop
+    while (glfwIsWindow(window) && running) {
+        // Poll events
+        glfwPollEvents();
+        
+        render();
+        
+        //break;
     }
     
-}
-
-// GLFW callbacks
-extern(C) {
-    void keyCallback(void* window, int key, int action) {
-        onKeyEvent(window, key, action);
-    }
+    cleanup();
 }
