@@ -8,7 +8,7 @@ I've only tested this on OSX - there might need to be modifications to it so tha
 
 # Instructions
 
-1. Edit `build.sh` to point to your Derelict installation
+1. Edit the makefile to point to your Derelict installation
 2. Build the project: `$ make`
 3. ...then run it: `$ make run`
 
