@@ -13,27 +13,31 @@ private:
     GLuint vertexShader;
     GLuint fragmentShader;
     
-    string m_vsPath, m_fsPath;
+    string vsPath, fsPath;
     
 public:
     
-    @property GLuint programID() { return program; }
-    
     this(string vsPath, string fsPath) {
-        m_vsPath = vsPath;
-        m_fsPath = fsPath;
+        this.vsPath = vsPath;
+        this.fsPath = fsPath;
         
         init();
     }
     
+    /// The program handle
+    @property GLuint programID() { return program; }
+    
+    /// Enable the shader
     void bind() {
         glUseProgram(program);
     }
     
+    /// Disable the shader
     void unbind() {
         glUseProgram(0);
     }
     
+    /// Cleans up the shader
     ~this() {
         writefln("Destroying shader");
         
@@ -47,19 +51,20 @@ public:
     
 private:
     
+    /// Initialise the shader program
     void init() {
         program = glCreateProgram();
         
-        vertexShader = createShader(GL_VERTEX_SHADER, m_vsPath);
-        fragmentShader = createShader(GL_FRAGMENT_SHADER, m_fsPath);
+        vertexShader = createShader(GL_VERTEX_SHADER, vsPath);
+        fragmentShader = createShader(GL_FRAGMENT_SHADER, fsPath);
         
         glAttachShader(program, vertexShader);
         glAttachShader(program, fragmentShader);
         
-        // Bind attributes and fragment data
         glBindAttribLocation(program, 0, "in_Position");
         glBindFragDataLocation(program, 0, "out_Color");
         
+        // Link and log errors
         glLinkProgram(program);
         writeProgramLog(program);
     }
@@ -73,6 +78,7 @@ private:
         const char* shaderFileData = toStringz(readText(shaderFile));
         glShaderSource(shader, 1, &shaderFileData, null);
         
+        // Compile and log errors
         glCompileShader(shader);
         writeShaderLog(shader);
         
