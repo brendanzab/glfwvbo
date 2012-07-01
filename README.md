@@ -2,15 +2,13 @@
 
 This project is illustrate how to use VBOs and Shaders with Derelict3.
 
-*I still haven't got this working*. All it does is display a blank screen. Any assistance would be most appreaciated.
-
-I am very much a beginner, so I would caution against considering my work an example of best practices. You have been warned! :)
+I am very much a beginner, so I would caution against using my work an example of best practices. You have been warned! :)
 
 I've only tested this on OSX - there might need to be modifications to it so that it can be run on Windows and Linux.
 
 # Instructions
 
-1. Edit the makefile to point to your Derelict installation
+1. Edit the makefile to match your system's configuration
 2. Build the project: `$ make`
 3. ...then run it: `$ make run`
 
