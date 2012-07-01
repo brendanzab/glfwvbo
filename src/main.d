@@ -1,10 +1,11 @@
 module glfwvbo.main;
 
+import glfwvbo.shader;
 import glfwvbo.util.gldebug;
 import glfwvbo.util.glfwdebug;
 import glfwvbo.util.prettyout;
 
-import std.conv, std.stdio, std.string, std.file;
+import std.conv, std.stdio, std.string;
 import derelict.glfw3.glfw3;
 import derelict.opengl3.gl3;
 
@@ -62,81 +63,11 @@ void initOpenGL() {
     glClearColor(0.2, 0.2, 0.2, 1);
 }
 
-GLuint createShader(GLenum shaderType, string shaderFile) {
-    // Create the OpenGL shader object
-    GLuint shader = glCreateShader(shaderType);
-    
-    // Read the shader from the file
-    writefln("Reading shader from %s", shaderFile);
-    const char* shaderFileData = toStringz(readText(shaderFile));
-    glShaderSource(shader, 1, &shaderFileData, null);
-    
-    glCompileShader(shader);
-    checkShader(shader);
-    return shader;
-}
-
-void checkShader(GLuint shader) {
-    // Throw an exception if the compilation fails
-    GLint succeeded;
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &succeeded);
-    
-    if (!succeeded) {
-        // Get log-length
-        GLint len;
-        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &len);
-        
-        // Get info log and throw exception
-        char[] log=new char[len];
-        glGetShaderInfoLog(shader, len, null, cast(char*)log);
-        throw new Exception(format("%s %s", errorString("GLSL Compile failure:"), log));
-    }
-}
-
-GLuint createProgram(GLuint shaders[]) {
-    // Create an empty program object
-    GLuint program = glCreateProgram();
-    
-    // Attach the shader objects to the program
-    foreach (GLuint s; shaders)
-        glAttachShader(program, s);
-    
-    // Bind the attribute so that it can be used in the GLSL shader
-    glBindAttribLocation(program, 0, "position");
-    // Bind the fragment shader's output
-    glBindFragDataLocation(program, 0, "fragColor");
-    
-    glLinkProgram(program);
-    checkProgram(program);
-    
-    return program;
-}
-
-void checkProgram(GLuint program) {
-    GLint succeeded;
-    glGetProgramiv(program, GL_LINK_STATUS, &succeeded);
-    
-    if (!succeeded) {
-        // Get log-length
-        GLint len;
-        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &len);
-        
-        // Get info log and throw exception
-        char[] log=new char[len];
-        glGetProgramInfoLog(program, len, null, cast(char*)log);
-        throw new Exception(format("%s %s", errorString("Program Linker failure:"), log));
-    }
-}
-
 // The handle for the shader program
-GLuint shaderProgram;
-GLuint shaders[];
+Shader shader;
 
 void initShaders() {
-    shaders ~= createShader(GL_VERTEX_SHADER, "resources/shader.vert");
-    shaders ~= createShader(GL_FRAGMENT_SHADER, "resources/shader.frag");
-    
-    shaderProgram = createProgram(shaders);
+    shader = new Shader("resources/shader.vert", "resources/shader.frag");
 }
 
 // 4D positions of the verticies
@@ -159,23 +90,21 @@ void initBuffers() {
     glBindBuffer(GL_ARRAY_BUFFER, positionBufferObject);
     glBufferData(GL_ARRAY_BUFFER, vertexPositions.length * float.sizeof, vertexPositions.ptr, GL_STATIC_DRAW);
     
-    // Set attribute-pointer
-    GLint positionLocation = glGetAttribLocation(shaderProgram, "position");
+    // Set attribute-pointers
+    GLint positionlocation = glGetAttribLocation(shader.programID, "in_Position");
     glVertexAttribPointer(
-        positionLocation,   // shader attribute
+        positionlocation,   // shader attribute
         4,                  // size
         GL_FLOAT,           // type
         GL_FALSE,           // normalized?
         0,                  // stride
         null                // array buffer offset
     );
-    glEnableVertexAttribArray(positionLocation);
+    glEnableVertexAttribArray(positionlocation);
     
     // Cleanup
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-    
-    writeGLError();
     
 }
 
@@ -184,7 +113,7 @@ void render() {
     glClear(GL_COLOR_BUFFER_BIT);
     
     // Activate the shader program
-    glUseProgram(shaderProgram);
+    shader.bind();
     
     // Draw the Vertex Array Object
     glBindVertexArray(vao);
@@ -192,11 +121,12 @@ void render() {
     glBindVertexArray(0);
     
     // Disable the program
-    glUseProgram(0);
+    shader.unbind();
     
     // Update the window
     glfwSwapBuffers();
     
+    // Print out OpenGL errors if there are any
     writeGLError();
 }
 
@@ -208,20 +138,9 @@ void init() {
 }
 
 void cleanup() {
-    
     writefln("Cleaning up OpenGL");
-    
     glBindVertexArray(0);
     glDeleteVertexArrays(1, &vao);
-    
-    glUseProgram(0);
-    glDeleteProgram(shaderProgram);
-    
-    // Detach the shaders
-    foreach (GLuint s; shaders) {
-        glDetachShader(shaderProgram, s);
-        glDeleteShader(s);
-    }
     
     writefln("Terminating GLFW");
     glfwTerminate();
@@ -237,7 +156,6 @@ void main() {
         
         render();
         
-        //break;
     }
     
     cleanup();

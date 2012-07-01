@@ -1,6 +1,6 @@
 EXECUTABLE_NAME 	= glfwvbo
 BUILD_PATH		 	= build
-D_SOURCE_FILES 		= src/main.d src/util/*.d -Isrc
+D_SOURCE_FILES 		= src/*.d src/util/*.d -Isrc
 DMD_BUILD_FLAGS 	= -gc
 
 # Change based on your derelict directory
