@@ -16,7 +16,30 @@ bool running = true;
 GLFWwindow window;
 int width = 640;
 int height = 480;
+
+
+void main() {
+    init();
     
+    // Main game loop
+    while (glfwIsWindow(window) && running) {
+        // Poll events
+        glfwPollEvents();
+        
+        render();
+        
+    }
+    
+    cleanup();
+}
+
+void init() {
+    initGLFW();
+    initOpenGL();
+    initShaders();
+    initBuffers();
+}
+
 void initGLFW(){
     
     // Initialise GLFW
@@ -113,7 +136,7 @@ void initBuffers() {
     glBindBuffer(GL_ARRAY_BUFFER, positionBufferObject);
     glBufferData(GL_ARRAY_BUFFER, vertexPositions.length * float.sizeof, vertexPositions.ptr, GL_STATIC_DRAW);
     
-    // Set attribute-pointers
+    // Set attribute-pointers to enable communication with the shader
     GLint positionlocation = glGetAttribLocation(shader.programID, "in_Position");
     glVertexAttribPointer(
         positionlocation,   // shader attribute
@@ -153,13 +176,6 @@ void render() {
     writeGLError();
 }
 
-void init() {
-    initGLFW();
-    initOpenGL();
-    initShaders();
-    initBuffers();
-}
-
 void cleanup() {
     writefln("Cleaning up OpenGL");
     glBindVertexArray(0);
@@ -167,19 +183,4 @@ void cleanup() {
     
     writefln("Terminating GLFW");
     glfwTerminate();
-}
-
-void main() {
-    init();
-    
-    // Main game loop
-    while (glfwIsWindow(window) && running) {
-        // Poll events
-        glfwPollEvents();
-        
-        render();
-        
-    }
-    
-    cleanup();
 }
